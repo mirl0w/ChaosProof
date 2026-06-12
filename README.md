@@ -2,6 +2,20 @@
 
 Automated chaos engineering via multi-agent reasoning on Microsoft Foundry.
 
+## What It Does
+
+ChaosProof is an autonomous chaos engineering platform powered by Microsoft AI Foundry multi-agent reasoning.
+
+The system:
+- Reads live telemetry and traces from distributed systems.
+- Builds a service dependency graph.
+- Predicts the blast radius of potential failures.
+- Plans safe chaos experiments automatically.
+- Executes fault injections in a sandboxed environment.
+- Validates recovery and system resilience.
+
+Unlike traditional chaos engineering tools that execute predefined failures, ChaosProof reasons about the current state of the system before acting.
+
 ## Setup (15 min)
 
 ### 1. Create Foundry project
