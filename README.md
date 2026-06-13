@@ -49,7 +49,7 @@ Each agent reasons from the previous agent's output — this is a genuine multi-
 
 ---
 
-## Setup (15 min)
+## Getting Started
 
 ### 1. Create Foundry project
 1. Go to https://ai.azure.com
