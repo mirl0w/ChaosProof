@@ -1,31 +1,72 @@
 # ChaosProof
 
-Automated chaos engineering via multi-agent reasoning on Microsoft Foundry.
+> Automated chaos engineering via multi-agent reasoning on Microsoft Foundry IQ.
+
+## Microsoft IQ Integration
+Built on **Foundry IQ** via Azure AI Foundry Agent Service.
+All five reasoning agents are orchestrated through Azure AI Agent Service
+using GPT-4.1-mini, with full observability through Foundry's agent tracing.
+
+## Track
+Microsoft Agents League Hackathon — **Reasoning Agents track**
+
+---
 
 ## What It Does
 
-ChaosProof is an autonomous chaos engineering platform powered by Microsoft AI Foundry multi-agent reasoning.
+ChaosProof is an autonomous chaos engineering platform powered by Microsoft Foundry IQ multi-agent reasoning.
+
+Unlike traditional chaos engineering tools (Chaos Monkey, LitmusChaos) that execute predefined failures,
+ChaosProof **reasons** about the current state of the system before acting.
 
 The system:
-- Reads live telemetry and traces from distributed systems.
-- Builds a service dependency graph.
-- Predicts the blast radius of potential failures.
-- Plans safe chaos experiments automatically.
-- Executes fault injections in a sandboxed environment.
-- Validates recovery and system resilience.
+- Reads live telemetry and traces from distributed services
+- Builds a service dependency graph and computes blast radius
+- Plans safe chaos experiments automatically — aborts if blast radius is too large
+- Executes fault injections in a sandboxed Docker environment
+- Generates concrete remediation artifacts (circuit breaker configs, k8s patches)
+- Validates recovery through a critic loop — retries with feedback if recovery fails
 
-Unlike traditional chaos engineering tools that execute predefined failures, ChaosProof reasons about the current state of the system before acting.
+---
+
+## The Five Agents
+
+| Agent | Model | Role |
+|---|---|---|
+| **Chaos Planner** | gpt-4.1-mini | Reads telemetry, proposes 3 ranked fault experiments |
+| **Graph Analyst** | gpt-4.1-mini | Computes blast radius, ranks experiments safest-first |
+| **Fault Injector** | gpt-4.1-mini | Simulates latency, crash, resource exhaustion in sandbox |
+| **Remediator** | gpt-4.1-mini | Diagnoses root cause, generates fix config |
+| **Verifier / Critic** | gpt-4.1-mini | Checks recovery, triggers retry loop if fail |
+
+Each agent reasons from the previous agent's output — this is a genuine multi-step reasoning chain, not a pipeline.
+
+---
+
+## Architecture
+
+![ChaosProof Architecture](Architecture.png)
+
+---
 
 ## Setup (15 min)
 
 ### 1. Create Foundry project
 1. Go to https://ai.azure.com
-2. Create a new project (or use existing hub)
-3. Copy the project endpoint URL
+2. Create a new project
+3. Deploy **gpt-4.1-mini** model
+4. Copy the project endpoint URL
 
 ### 2. Install dependencies
 ```bash
-python -m venv .venv && source .venv/bin/activate
+# Windows
+python -m venv .venv
+.venv\Scripts\activate
+
+# Mac/Linux
+python -m venv .venv
+source .venv/bin/activate
+
 pip install -r requirements.txt
 ```
 
@@ -33,7 +74,7 @@ pip install -r requirements.txt
 ```bash
 cp .env.example .env
 # Edit .env — add AZURE_PROJECT_ENDPOINT
-# For local dev, `az login` handles auth via DefaultAzureCredential
+az login   # handles auth automatically
 ```
 
 ### 4. Create the five agents (run once)
@@ -45,31 +86,8 @@ python main.py --setup
 ### 5. Run ChaosProof
 ```bash
 python main.py --service order-service
+python main.py --service payment-service
 ```
 
-## Viewing the reasoning trace
-After each run, copy the printed Thread ID and open:
-**Foundry portal > your project > Agents > Threads > paste ID**
+---
 
-You will see every agent's reasoning step, tool calls, and outputs —
-exactly what judges want to see for the Reasoning Agents track.
-
-## Replacing stubs with real data
-| File | Stub to replace |
-|------|----------------|
-| tools/otel_tool.py | `get_recent_traces()` → query Jaeger/Tempo/OTLP |
-| tools/graph_tool.py | `build_service_graph()` → k8s API / Consul / Istio |
-| tools/docker_tool.py | Works as-is with Docker Desktop or DinD |
-
-## Project structure
-```
-chaosproof/
-├── agents/setup.py       # Creates all 5 Foundry agents
-├── tools/
-│   ├── graph_tool.py     # NetworkX dependency graph
-│   ├── docker_tool.py    # Sandboxed fault injection
-│   └── otel_tool.py      # Telemetry collection
-├── orchestrator.py       # Main reasoning loop
-├── main.py               # Entrypoint
-└── demo/script.md        # 5-minute demo guide
-```
