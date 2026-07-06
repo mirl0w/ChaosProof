@@ -43,9 +43,6 @@ Each agent reasons from the previous agent's output — this is a genuine multi-
 
 ---
 
-## Architecture
-
-![ChaosProof Architecture](Architecture.png)
 
 ---
 
