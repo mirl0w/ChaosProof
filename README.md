@@ -27,7 +27,7 @@ The system:
 - Generates concrete remediation artifacts (circuit breaker configs, k8s patches)
 - Validates recovery through a critic loop — retries with feedback if recovery fails
 
----
+!
 
 ## The Five Agents
 
