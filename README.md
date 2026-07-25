@@ -24,7 +24,7 @@ The system:
 - Builds a service dependency graph and computes blast radius
 - Plans safe chaos experiments automatically — aborts if blast radius is too large
 - Executes fault injections in a sandboxed Docker environment
-- Generates concrete remediation artifacts! (circuit breaker configs, k8s patches)
+- Generates concrete remediation artifacts (circuit breaker configs, k8s patches)
 - Validates recovery through a critic loop — retries with feedback if recovery fails
 
 
